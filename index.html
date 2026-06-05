@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jaga Tubuhku, Lindungi Diriku! — Portal Belajar</title>
+  
+  <!-- Tailwind CSS untuk Styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Alpine.js untuk Logika Interaktif & State Management -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sky: { DEFAULT: '#7EC8E3', light: '#EBF7FB' },
+            green: { DEFAULT: '#6BBF59', light: '#EAF7E6' },
+            yellow: '#FFD166',
+            orange: '#F4845F',
+            pink: '#F7A8C4',
+            brown: '#6B4423',
+            cream: '#FFF9F0',
+            textMain: '#3D2B1F',
+            textLight: '#7A6358',
+          },
+          fontFamily: {
+            nunito: ['Nunito', 'sans-serif'],
+            baloo: ['"Baloo 2"', 'cursive'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background-color: #FFF9F0;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      75% { transform: translateX(4px); }
+    }
+    .animate-shake {
+      animation: shake 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body class="text-textMain min-h-screen flex flex-col" 
+      x-data="{ 
+        activeTab: 'home',
+        
+        // Materi State
+        currentSlide: 0,
+        slidesMateri: [
+          { title: 'Mengenal Hak Atas Tubuhku', content: 'Tubuhmu adalah milikmu sepenuhnya. Tidak ada seorang pun yang boleh menyentuh tubuhmu tanpa izin, terutama area pribadi yang tertutup pakaian dalam.' },
+          { title: 'Aturan Sentuhan Aman', content: 'Sentuhan aman adalah sentuhan hangat dari orang tua atau dokter yang memeriksa didampingi orang tua. Sentuhan tidak aman adalah sentuhan yang membuatmu risih atau meminta rahasia.' }
+        ],
+
+        // Quiz State
+        quizIdx: 0,
+        selectedAns: null,
+        isAnswered: false,
+        score: 0,
+        quizFinished: false,
+        questions: [
+          {
+            q: 'Bagian tubuh mana yang tidak boleh dilihat atau disentuh sembarangan oleh orang lain?',
+            a: ['Tangan', 'Bibir dan area tertutup baju dalam', 'Rambut', 'Kaki'],
+            correct: 1,
+            hint: 'Benar! Bibir, dada, dan area pribadi lainnya dilindungi oleh aturan sentuhan aman.'
+          },
+          {
+            q: 'Apa yang harus kamu lakukan jika seseorang membuatmu merasa tidak nyaman?',
+            a: ['Diam saja', 'Menangis di kamar', 'Katakan TIDAK, Lari, dan LAPOR ke orang dewasa tepercaya', 'Menuruti permintaannya'],
+            correct: 2,
+            hint: 'Hebat! Rumus utamanya adalah katakan TIDAK/JANGAN, pergi menjauh, dan LAPORKAN segera!'
+          }
+        ],
+
+        // Matching Game State
+        selectedPremise: null,
+        matchedPairs: [],
+        wrongMatchId: null,
+        premises: [
+          { id: 1, text: 'Bibir, Dada, Area Intim' },
+          { id: 2, text: 'Sentuhan Ibu saat memandikan' },
+          { id: 3, text: 'Tindakan jika dirayu orang asing' }
+        ],
+        responses: [
+          { id: 2, text: 'Sentuhan Aman & Boleh' },
+          { id: 1, text: 'Sentuhan Tidak Boleh / Area Rahasia' },
+          { id: 3, text: 'Lari dan Laporkan!' }
+        ],
+
+        // Functions
+        handleOptionClick(idx) {
+          if (this.isAnswered) return;
+          this.selectedAns = idx;
+          this.isAnswered = true;
+          if (idx === this.questions[this.quizIdx].correct) {
+            this.score += 50;
+          }
+        },
+        nextQuestion() {
+          this.selectedAns = null;
+          this.isAnswered = false;
+          if (this.quizIdx + 1 < this.questions.length) {
+            this.quizIdx++;
+          } else {
+            this.quizFinished = true;
+          }
+        },
+        resetQuiz() {
+          this.quizIdx = 0;
+          this.selectedAns = null;
+          this.isAnswered = false;
+          this.score = 0;
+          this.quizFinished = false;
+        },
+        handleMatchClick(id, type) {
+          if (type === 'premise') {
+            if (this.matchedPairs.includes(id)) return;
+            this.selectedPremise = id;
+          } else if (type === 'response') {
+            if (!this.selectedPremise) return;
+            if (this.selectedPremise === id) {
+              this.matchedPairs.push(id);
+              this.selectedPremise = null;
+            } else {
+              this.wrongMatchId = id;
+              setTimeout(() => this.wrongMatchId = null, 800);
+            }
+          }
+        }
+      }">
+
+  <!-- HEADER NAVIGASI -->
+  <header class="sticky top-0 z-50 bg-gradient-to-r from-sky to-yellow shadow-md">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl shadow">🛡️</div>
+        <div>
+          <h1 class="font-baloo font-extrabold text-lg text-brown leading-tight">Jaga Tubuhku, Lindungi Diriku!</h1>
+          <span class="text-xs font-semibold text-textLight block">Portal Pembelajaran · PNF UNNES</span>
+        </div>
+      </div>
+      <nav class="flex flex-wrap gap-2">
+        <button @click="activeTab = 'home'" :class="activeTab === 'home' ? 'bg-white text-orange shadow' : 'bg-white/50 text-brown hover:bg-white'" class="px-4 py-2 rounded-full font-bold text-sm flex items-center gap-1 transition-all">🏠 Beranda</button>
+        <button @click="activeTab = 'materi'" :class="activeTab === 'materi' ? 'bg-white text-orange shadow' : 'bg-white/50 text-brown hover:bg-white'" class="px-4 py-2 rounded-full font-bold text-sm flex items-center gap-1 transition-all">📚 Modul & PPT</button>
+        <button @click="activeTab = 'kuis'" :class="activeTab === 'kuis' ? 'bg-white text-orange shadow' : 'bg-white/50 text-brown hover:bg-white'" class="px-4 py-2 rounded-full font-bold text-sm flex items-center gap-1 transition-all">🏅 Klinik Kuis</button>
+        <button @click="activeTab = 'profil'" :class="activeTab === 'profil' ? 'bg-white text-orange shadow' : 'bg-white/50 text-brown hover:bg-white'" class="px-4 py-2 rounded-full font-bold text-sm flex items-center gap-1 transition-all">👤 Profil</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- KONTEN UTAMA -->
+  <main class="max-w-6xl mx-auto px-6 py-8 flex-1 w-full">
+    
+    <!-- TAB 1: BERANDA -->
+    <div x-show="activeTab === 'home'" x-transition>
+      <div class="bg-gradient-to-br from-sky via-green-light to-yellow rounded-3xl p-10 flex flex-col md:flex-row items-center gap-8 shadow-xl mb-8">
+        <div class="flex-1">
+          <span class="inline-block bg-white/90 text-orange font-extrabold text-xs px-3 py-1 rounded-full uppercase tracking-wider mb-3">Selamat Datang</span>
+          <h2 class="font-baloo font-extrabold text-3xl text-brown mb-4">Halo Sahabat Pintar! Yuk Belajar Menjaga Diri ✨</h2>
+          <p class="text-sm text-textMain/80 leading-relaxed max-w-lg">Media interaktif ini dirancang khusus untuk membantumu mengenali area tubuh, memahami privasi, serta langkah darurat melindungi diri.</p>
+        </div>
+        <div class="text-7xl animate-bounce">🧑‍✈️</div>
+      </div>
+
+      <h3 class="font-baloo font-extrabold text-xl text-brown mb-4 flex items-center gap-2">🚀 Menu Aktivitas Utama</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div @click="activeTab = 'materi'" class="bg-white p-6 rounded-2xl shadow-sm border-t-4 border-sky cursor-pointer hover:-translate-y-1 transition-all">
+          <div class="text-4xl mb-2">📚</div>
+          <h4 class="font-baloo font-bold text-lg text-brown">E-Modul & Peta Materi</h4>
+          <p class="text-xs text-textLight mt-1">Pelajari infografis warna-warni dan ringkasan PPT interaktif tentang pertolongan gawat darurat mandiri.</p>
+        </div>
+        <div @click="activeTab = 'kuis'" class="bg-white p-6 rounded-2xl shadow-sm border-t-4 border-orange cursor-pointer hover:-translate-y-1 transition-all">
+          <div class="text-4xl mb-2">🎮</div>
+          <h4 class="font-baloo font-bold text-lg text-brown">Game Interaktif & Kuis</h4>
+          <p class="text-xs text-textLight mt-1">Uji pemahamanmu lewat permainan seru mencocokkan kata dan kuis evaluasi berhadiah poin skor.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: MATERI -->
+    <div x-show="activeTab === 'materi'" x-transition>
+      <div class="bg-white p-6 rounded-3xl shadow-sm mb-6">
+        <h3 class="font-baloo font-extrabold text-xl text-brown mb-4">📘 Peta Konsep Belajar</h3>
+        <div class="bg-sky-light rounded-2xl p-6 text-center border border-sky/30">
+          <div class="inline-block bg-gradient-to-r from-sky to-green text-white font-baloo font-extrabold px-6 py-2 rounded-full mb-6 shadow-sm">Aku Aman & Hebat</div>
+          <div class="flex flex-wrap justify-center gap-4">
+            <div class="bg-white border-2 border-sky p-4 rounded-xl min-w-[150px]">
+              <h5 class="font-bold text-sm text-brown">1. Kenali Tubuh</h5>
+              <p class="text-[11px] text-textLight mt-1">Bibir, Dada, Area Pakaian Dalam</p>
+            </div>
+            <div class="bg-white border-2 border-green p-4 rounded-xl min-w-[150px]">
+              <h5 class="font-bold text-sm text-brown">2. Ambil Tindakan</h5>
+              <p class="text-[11px] text-textLight mt-1">Tolak, Lari, Lapor Orang Tua</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl shadow-sm overflow-hidden mb-6">
+        <div class="bg-gradient-to-r from-sky to-green p-4 text-white flex justify-between items-center">
+          <h4 class="font-bold text-sm" x-text="slidesMateri[currentSlide].title"></h4>
+          <span class="text-xs">Slide <span x-text="currentSlide + 1"></span> dari <span x-text="slidesMateri.length"></span></span>
+        </div>
+        <div class="p-6">
+          <p class="text-sm leading-relaxed text-textMain" x-text="slidesMateri[currentSlide].content"></p>
+          <div class="flex justify-between items-center mt-6 pt-4 border-t border-cream">
+            <button :disabled="currentSlide === 0" @click="currentSlide--" class="bg-sky disabled:bg-sky-light disabled:cursor-not-allowed text-white px-4 py-2 rounded-full font-bold text-xs transition-all">Sebelumnya</button>
+            <button :disabled="currentSlide === slidesMateri.length - 1" @click="currentSlide++" class="bg-sky disabled:bg-sky-light disabled:cursor-not-allowed text-white px-4 py-2 rounded-full font-bold text-xs transition-all">Selanjutnya</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: KUIS & GAME -->
+    <div x-show="activeTab === 'kuis'" x-transition class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      <!-- Komponen Kuis Pilihan Ganda -->
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-cream">
+        <h3 class="font-baloo font-extrabold text-lg text-brown mb-4 flex items-center gap-2">📝 Kuis Pilihan Ganda</h3>
+        
+        <div x-show="!quizFinished">
+          <div class="w-full bg-cream rounded-full h-2 mb-4 overflow-hidden">
+            <div class="bg-green h-full transition-all duration-300" :style="`width: ${((quizIdx + 1) / questions.length) * 100}%`"></div>
+          </div>
+          <p class="text-xs text-textLight font-bold mb-1">Pertanyaan <span x-text="quizIdx + 1"></span> dari <span x-text="questions.length"></span></p>
+          <h4 class="font-baloo font-bold text-base text-brown mb-4" x-text="questions[quizIdx].q"></h4>
+          
+          <div class="flex flex-col gap-2">
+            <template x-for="(option, index) in questions[quizIdx].a" :key="index">
+              <button 
+                :disabled="isAnswered"
+                @click="handleOptionClick(index)"
+                :class="
+                  isAnswered 
+                    ? (index === questions[quizIdx].correct ? 'bg-green-light border-green text-green font-bold' : (index === selectedAns ? 'bg-red-50 border-red-400 text-red-600' : 'bg-cream border-cream opacity-60'))
+                    : 'bg-cream border-cream hover:border-sky text-textMain'
+                "
+                class="text-left text-sm p-3 rounded-xl font-medium border-2 transition-all"
+                x-text="option">
+              </button>
+            </template>
+          </div>
+
+          <div x-show="isAnswered" x-transition class="mt-4 p-3 bg-sky-light text-sky text-xs rounded-xl font-bold" x-text="questions[quizIdx].hint"></div>
+          
+          <button x-show="isAnswered" @click="nextQuestion()" class="w-full mt-4 bg-orange text-white py-3 rounded-full font-bold text-sm shadow-sm hover:bg-orange/90 transition-all" x-text="quizIdx + 1 === questions.length ? 'Lihat Hasil' : 'Pertanyaan Selanjutnya'"></button>
+        </div>
+
+        <div x-show="quizFinished" class="text-center py-6" x-transition>
+          <div class="w-20 h-20 bg-gradient-to-tr from-yellow to-orange text-white rounded-full flex items-center justify-center text-3xl font-extrabold mx-auto mb-4 shadow" x-text="score"></div>
+          <h4 class="font-baloo font-bold text-lg text-brown mb-2">Luar Biasa! Kuis Selesai!</h4>
+          <button @click="resetQuiz()" class="bg-orange text-white px-6 py-2 rounded-full font-bold text-xs mt-2 transition-all hover:scale-105">Ulangi Kuis</button>
+        </div>
+      </div>
+
+      <!-- Komponen Game Mencocokkan -->
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-cream">
+        <h3 class="font-baloo font-extrabold text-lg text-brown mb-2">🤝 Game Mencocokkan</h3>
+        <p class="text-xs text-textLight mb-4">Klik satu kartu di kiri (Situasi), kemudian pasangkan dengan respon yang tepat di sebelah kanan!</p>
+        
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Kolom Situasi (Premise) -->
+          <div class="flex flex-col gap-2">
+            <h5 class="text-xs font-bold text-textLight uppercase tracking-wider mb-1">Situasi</h5>
+            <template x-for="p in premises" :key="p.id">
+              <div 
+                @click="handleMatchClick(p.id, 'premise')"
+                :class="
+                  matchedPairs.includes(p.id) 
+                    ? 'bg-green-light border-green text-green pointer-events-none opacity-60' 
+                    : (selectedPremise === p.id ? 'border-sky bg-sky-light text-sky scale-95' : 'bg-cream border-cream hover:border-sky')
+                "
+                class="p-3 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer select-none"
+                x-text="p.text">
+              </div>
+            </template>
+          </div>
+
+          <!-- Kolom Respon (Response) -->
+          <div class="flex flex-col gap-2">
+            <h5 class="text-xs font-bold text-textLight uppercase tracking-wider mb-1">Respon / Solusi</h5>
+            <template x-for="r in responses" :key="r.id">
+              <div 
+                @click="handleMatchClick(r.id, 'response')"
+                :class="
+                  matchedPairs.includes(r.id) 
+                    ? 'bg-green-light border-green text-green pointer-events-none opacity-60' 
+                    : (wrongMatchId === r.id ? 'border-red-400 bg-red-50 animate-shake' : 'bg-cream border-cream hover:border-sky')
+                "
+                class="p-3 text-xs font-bold rounded-xl border-2 transition-all cursor-pointer select-none"
+                x-text="r.text">
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <div class="text-center mt-6 font-baloo font-bold text-brown text-sm">
+          Berhasil Berpasangan: <span class="text-green" x-text="matchedPairs.length"></span> / <span x-text="premises.length"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: PROFIL -->
+    <div x-show="activeTab === 'profil'" x-transition>
+      <div class="bg-gradient-to-r from-pink to-yellow rounded-3xl p-8 flex flex-col md:flex-row items-center gap-6 shadow-md mb-6">
+        <div class="w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl shadow-inner">🎓</div>
+        <div>
+          <h2 class="font-baloo font-extrabold text-2xl text-brown">Siswa Pembelajar Tangguh</h2>
+          <p class="text-xs text-brown/70 mt-1">Program Kesetaraan Paket A · Nonformal UNNES</p>
+          <div class="flex gap-2 mt-3">
+            <span class="bg-white/80 text-brown text-xs font-bold px-3 py-1 rounded-full">Level: Dasar</span>
+            <span class="bg-white/80 text-brown text-xs font-bold px-3 py-1 rounded-full">Status: Aktif</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white p-4 rounded-xl text-center shadow-sm border border-cream">
+          <div class="font-baloo font-extrabold text-2xl text-orange" x-text="score"></div>
+          <p class="text-[10px] text-textLight mt-1 uppercase tracking-wide font-bold">Total Poin Kuis</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl text-center shadow-sm border border-cream">
+          <div class="font-baloo font-extrabold text-2xl text-green" x-text="matchedPairs.length"></div>
+          <p class="text-[10px] text-textLight mt-1 uppercase tracking-wide font-bold">Match Sukses</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-cream py-4 text-center text-xs text-textLight">
+    <p>&copy; 2026 Jaga Tubuhku, Lindungi Diriku! · Dikembangkan untuk PNF UNNES</p>
+  </footer>
+
+</body>
+</html>
